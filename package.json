@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "check:statuses": "node scripts/check-ticket-statuses.cjs"
+    "check:statuses": "node scripts/check-ticket-statuses.cjs",
+    "check:ranking": "node scripts/check-ranking.cjs"
   },
   "engines": {
     "node": ">=22.15.0 <23"

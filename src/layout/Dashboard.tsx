@@ -7,12 +7,11 @@ import { getDemoUser, logoutDemo, roleLabels } from '@/data/access-profiles'
 
 const adminItems = [
   { label: 'Dashboard', symbol: '◫', path: '/dashboard' },
+  { label: 'Ranking', symbol: '☆', path: '/ranking' },
   { label: 'Chamados', symbol: '▤', path: '/chamados' },
   { label: 'Novo chamado', symbol: '+', path: '/novo-chamado' },
   { label: 'Mapa dos técnicos', symbol: '◎', path: '/mapa-tecnicos' },
   { label: 'Técnicos', symbol: '♧', path: '/tecnicos' },
-  { label: 'Conquistas', symbol: '☆' },
-  { label: 'Relatórios', symbol: '▥' },
 ]
 
 export default function DashboardLayout() {
@@ -32,7 +31,7 @@ export default function DashboardLayout() {
   const items: { label: string; symbol: string; path?: string }[] = [
     ...(user.role === 'administrador' ? adminItems : user.role === 'usuario'
       ? [{ label: 'Meus chamados', symbol: '▤', path: '/meus-chamados' }, { label: 'Novo chamado', symbol: '+', path: '/novo-chamado' }]
-      : [{ label: 'Minhas missões', symbol: '▤', path: '/minhas-missoes' }, { label: 'Ranking', symbol: '☆' }]),
+      : [{ label: 'Dashboard', symbol: '◫', path: '/dashboard-tecnico' }, { label: 'Minhas missões', symbol: '▤', path: '/minhas-missoes' }, { label: 'Ranking', symbol: '☆', path: '/ranking' }]),
     { label: 'Notificações', symbol: '♧', path: '/notificacoes' },
     { label: 'Meu perfil', symbol: '○', path: '/perfil' },
   ]

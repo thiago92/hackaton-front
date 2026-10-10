@@ -21,7 +21,7 @@ function availableAccounts(): (DemoAccount & { secretaries?: string[]; callTypes
   return [...demoAccounts.filter(account => account.role !== 'tecnico'), ...(catalog.error ? [] : catalog.technicians.map(tech => ({ id: tech.id, name: tech.name, email: tech.email, password: tech.password, role: 'tecnico' as const, secretary: tech.secretaries[0], department: tech.callTypes.join(', '), secretaries: tech.secretaries, callTypes: tech.callTypes })))]
 }
 export const roleLabels: Record<AccessRole, string> = { usuario: 'Usuário da prefeitura', tecnico: 'Técnico', administrador: 'Administrador' }
-export const roleHome: Record<AccessRole, string> = { usuario: '/meus-chamados', tecnico: '/minhas-missoes', administrador: '/dashboard' }
+export const roleHome: Record<AccessRole, string> = { usuario: '/meus-chamados', tecnico: '/dashboard-tecnico', administrador: '/dashboard' }
 const sessionKey = 'missao-sjp.demo-session.v1'
 export function getDemoUser(): DemoUser | null {
   try {

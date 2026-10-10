@@ -35,7 +35,7 @@ Referência histórica: manual, páginas 21–23. Esta avaliação é do fronten
 | Integração bidirecional | Não demonstrada pelo frontend | Origem/ID externo, entrada/saída, deduplicação e recuperação com legado |
 | Web/mobile com push | Jornada responsiva e central local | Aplicativo validado em aparelho, push e captura em segundo plano |
 | Rastreabilidade, validação e acesso | Histórico, intervalos, validação/avaliação e guardas demonstrativos | Autorização no servidor, persistência operacional, evidências e auditoria |
-| Gamificação configurável | Não implementada | Pontos provisórios/confirmados, regras, rankings e períodos preservando histórico |
+| Gamificação configurável | Ranking individual, pontos por prioridade, provisório/confirmado/revisão e períodos com persistência mockada | Ranking por equipe, regras configuráveis, divisão de colaboração e integração operacional |
 | IA demonstrável | Não implementada | Auxílio útil e revisável, conforme passo 10; implantação compatível |
 | Hospedagem municipal/código-fonte | Build e instruções do frontend disponíveis | Documentação integrada, infraestrutura, dependências/licenças/custos e tiles do mapa |
 
@@ -43,7 +43,7 @@ Referência histórica: manual, páginas 21–23. Esta avaliação é do fronten
 
 1. Dados, credenciais e guardas são demonstrativos; a API não é consumida pela jornada. Não usar dados ou senhas reais.
 2. Persistência local não sincroniza outro dispositivo. Backend/mobile precisam ser conferidos e integrar as mesmas regras, sem presumir que faltam funcionalidades nesses projetos.
-3. Cooperação aprovada em chamado já assumido, foto/perfil editável, anexos/evidências, pontos/ranking, IA e relatórios completos permanecem pendentes.
+3. Cooperação aprovada em chamado já assumido, foto/perfil editável, anexos/evidências, ranking por equipe/configuração e IA permanecem pendentes. Ranking individual por técnico foi entregue no mock (seção 14). Relatórios completos ficam para etapa posterior; o dashboard atende ao acompanhamento inicial.
 4. GPS real, push, tratamento de segundo plano e política de plantão/escalonamento não foram demonstrados. Posições fictícias não comprovam deslocamento ou execução.
 5. Contrato atual ainda contém campos legados em texto; unidades, catálogos, participantes e timestamps precisam de contrato operacional com IDs e validação no servidor.
 6. Matriz de prioridade por impacto/urgência não está implementada: usuário abre com Normal; administrador escolhe Baixa/Normal/Alta no cadastro.
@@ -95,7 +95,7 @@ Prioridade e pontos devem seguir regra configurada, sem permitir que o solicitan
 - Eventos incluem descrição, tipo, autor e horário, preservados após pausa, transferência, conclusão e reabertura.
 - Tempo ativo é soma dos intervalos iniciar/retomar até pausar/concluir; tempo pausado e tempo total são indicadores separados. Na operação integrada, relógio visual deve derivar dos timestamps do servidor e não zerar após fechar/reabrir o app. No mock atual, os intervalos usam o relógio do navegador e persistem após recarga.
 - Pausa exige motivo categorizado e descrição quando necessária: material/terceiros, urgência autorizada, intervalo ou fim de expediente. O motivo fica registrado para indicadores; no frontend atual nenhuma pausa altera a disponibilidade informada. Automação de disponibilidade por motivo/turno continua pendente. Pausa interrompe contagem ativa e coleta/envio de novas posições. Retomada cria novo intervalo. Dados já capturados permanecem no histórico; envio tardio deve manter timestamp original e ser identificado como histórico.
-- Conclusão encerra cronômetro/coleta e deixa a etapa interna Aguardando validação; o status do chamado permanece Em análise. A futura pontuação seguirá a política provisória/confirmada; pontos ainda não são concedidos no frontend. Resolução confirmada permanece etapa distinta.
+- Conclusão encerra cronômetro/coleta e deixa a etapa interna Aguardando validação; o status do chamado permanece Em análise. A futura pontuação seguirá a política provisória/confirmada; pontos provisórios já são registrados no mock do frontend conforme seção 14. Resolução confirmada permanece etapa distinta.
 
 ### Monitoramento, localização e mapa
 
@@ -146,7 +146,7 @@ Se houver retirada de equipamento/material, registrar necessidade e local de ret
 
 ### Pontuação e ranking
 
-Cada chamado tem pontos previstos segundo regras configuradas; técnico recebe crédito ao concluir. Para conciliar com qualidade e confirmação exigidas pelo manual, adota-se crédito provisório na conclusão e definitivo na confirmação, com ajuste auditável em reabertura. Essa política passa a ser adotada nesta revisão; pesos, divisão de crédito e tratamento da ausência de resposta ainda devem ser configurados. Repetir conclusão, retransmitir evento ou transferir chamado não duplica pontos. Cooperação deve registrar contribuição e regra de divisão/bonificação explícita; não penalizar recusa voluntária nem pausa por dependência externa. Ranking individual e por equipe, períodos e histórico permanecem requisitos do manual.
+A gamificação é um jogo interno de reconhecimento das contribuições dos técnicos, com pontos e rankings individual e por equipe. Regras consolidadas a partir do plano do backend no commit 98e24e0; ver seção 13. Cada chamado terá pontos previstos segundo regras configuradas; técnico recebe crédito provisório ao concluir. Pontuação individual já implementada com mocks: Baixa 10, Normal 20 e Alta 40; detalhamento, acesso e limites na seção 14. Para conciliar com qualidade e confirmação exigidas pelo manual, adota-se crédito provisório na conclusão e definitivo na confirmação, com ajuste auditável em reabertura. Essa política passa a ser adotada nesta revisão; pesos, divisão de crédito e tratamento da ausência de resposta ainda devem ser configurados. Repetir conclusão, retransmitir evento ou transferir chamado não duplica pontos. Cooperação deve registrar contribuição e regra de divisão/bonificação explícita; não penalizar recusa voluntária nem pausa por dependência externa. Ranking individual e por equipe, períodos e histórico permanecem requisitos do manual.
 
 ### Decisões pendentes sem bloquear a documentação
 
@@ -173,7 +173,8 @@ Cada chamado tem pontos previstos segundo regras configuradas; técnico recebe c
 | Avisos | Destinatário fixado no evento; leitura por conta; deduplicação; avisos de abertura/vínculo/conclusão/pendência/devolução | Persistir eventos e leitura no servidor; push como transporte; validar acesso atual ao abrir |
 | Mapa/proximidade | Últimas posições fictícias; 10 minutos com plataforma aberta; convite entre secretarias em abertura presencial | GPS real, precisão/idade, cadência em aparelho, segundo plano, envio e parâmetros configurados |
 | Cooperação em chamado assumido | Não implementada | Oferta, aprovação, participantes, tempos próprios e política global de pausa/conclusão |
-| Foto/evidências/pontos/IA | Não implementados | Contratos, armazenamento, acesso e regras conforme próximas etapas |
+| Ranking individual | Entregue no mock, com dashboard técnico e filtros administrativos; usuário sem acesso | Autoridade de cálculo/persistência operacional, equipes e regras configuráveis |
+| Foto/evidências/IA | Não implementados | Contratos, armazenamento, acesso e regras conforme próximas etapas |
 
 Não marcar backend/mobile como entregues com base nesta tabela. Conferir o que já existe nesses projetos antes de implementar a integração.
 
@@ -274,7 +275,7 @@ Conceder pontos provisórios únicos na conclusão e definitivos na confirmaçã
 | Prioridade por impacto/urgência | Campos registrados; Normal para usuário e escolha administrativa no cadastro | Matriz configurável, alteração justificada e escalonamento |
 | Pausa categorizada | Motivos, intervalos e tempo ativo persistidos no mock | Persistência operacional e indicadores ampliados de espera/execução |
 | Confirmação sem resposta | Não implementada | Lembretes, alerta administrativo e estado pendente |
-| Crédito provisório/confirmado | Não implementado | Livro de lançamentos idempotente, ajustes e ranking separado |
+| Crédito provisório/confirmado | Crédito único por chamado e revisões persistidos no mock; ranking individual com saldos separados | Backend, divisão de colaboradores e regras configuráveis |
 
 ## 5. Passo a passo das pendências
 
@@ -537,7 +538,7 @@ Antes de implementar transições, explicitar o efeito da pausa/conclusão do re
 1. Cooperação aprovada em chamado já assumido, conforme critérios acima.
 2. Perfil editável e foto do técnico: persistência mockada, validação do arquivo e exibição no perfil/mapa; upload operacional futuro.
 3. Evidências do atendimento: anexar e consultar com autoria, horário, limites e acesso por perfil; preservar vínculo ao atendimento/histórico.
-4. Ranking e pontos: crédito provisório na conclusão e confirmado na validação; contribuição dos colaboradores e ajustes de reabertura explicáveis, auditáveis e sem duplicação; rankings individual/equipe por período, preservando histórico.
+4. Ranking e jogo interno, conforme seção 13: crédito provisório na conclusão e confirmado na validação; contribuição dos colaboradores e ajustes de reabertura explicáveis, auditáveis e sem duplicação; rankings individual/equipe por período, preservando histórico.
 
 Pesos, divisão de crédito, tratamento de ausência de confirmação e parâmetros operacionais continuam pendentes de definição. Estas etapas são planejadas, não funcionalidades concluídas. A sequência não remove requisitos futuros de backend, GPS/push reais, integração com legado e implantação, nem a divergência de IA: fora da interface nesta fase, embora exigida pelo manual para a entrega final.
 
@@ -584,4 +585,145 @@ Mantida a confirmação do solicitante já adotada no produto; simplificar statu
 
 Migração: Aberto → Em aberto; Resolvido → Resolvido; demais status antigos → Em análise. A etapa original permanece em executionState; preservar IDs, vínculos, intervalos, histórico, posições, avisos e validações. Não descartar chamados existentes nem apagar armazenamento. Kanban passa a três colunas; filtros de status e indicadores usam apenas o catálogo novo. Detalhes exibem a etapa de execução para orientar ações.
 
-Trechos anteriores com estados antigos descrevem etapas internas ou histórico de entregas e não ampliam o catálogo vigente. Cooperação, perfis/fotos, evidências e ranking seguem pendentes. Validação desta mudança: lint, build e npm run check:statuses aprovados (migração dos oito estados, recarga, dados inválidos/falha de gravação, permissões, uma execução ativa, pausa/bloqueio, posições, conclusão, pendência, devolução e confirmação). Verificação visual em navegador/celular permanece pendente; build mantém aviso de bundle acima de 500 kB.
+Trechos anteriores com estados antigos descrevem etapas internas ou histórico de entregas e não ampliam o catálogo vigente. Cooperação, perfis/fotos, evidências e ranking por equipe seguem pendentes; ranking individual posteriormente entregue na seção 14. Validação desta mudança: lint, build e npm run check:statuses aprovados (migração dos oito estados, recarga, dados inválidos/falha de gravação, permissões, uma execução ativa, pausa/bloqueio, posições, conclusão, pendência, devolução e confirmação). Verificação visual em navegador/celular permanece pendente; build mantém aviso de bundle acima de 500 kB.
+
+
+## 12. Menus desta fase — 09/10/2026
+
+Decisão do usuário: retirar Conquistas e Relatórios dos menus do frontend, em desktop e mobile. Itens eram desabilitados e não possuíam rotas próprias. O dashboard permanece para acompanhamento inicial. Relatórios detalhados ficam para depois; pontos e rankings individual/equipe continuam no planejamento e no requisito de gamificação do manual. A remoção não altera permissões, chamados, indicadores ou contratos de backend/mobile. Ranking do técnico era Em breve nesta entrega; foi habilitado posteriormente na seção 14.
+
+Entregue: removidas as duas entradas do catálogo compartilhado de navegação administrativa. Validação: revisão do catálogo e das referências; lint aprovado. Não realizada validação visual em navegador.
+
+
+## 13. Ranking e gamificação como jogo interno — alinhamento com backend, 09/10/2026
+
+### Fonte e alcance desta atualização
+
+Fonte: [plano de regras do backend](../Hackaton-backend/ANALISE_FRONTEND_E_PLANO_DE_IMPLEMENTACAO.md), incluído no commit **98e24e0 — add regra ranking**, especialmente Pontuação e ranking, Conclusão/confirmação/pontuação e Passo 9 — Gamificação configurável. O pedido atual define a experiência como um **jogo interno** para reconhecer o atendimento e a colaboração dos técnicos.
+
+Registro do alinhamento anterior: o commit do backend consultado adiciona documentação, sem comprovar endpoints. Naquele momento não havia ranking no frontend; a implementação posterior está registrada na seção 14. As regras abaixo também orientam backend e mobile. Preservar as regras mais recentes do frontend: status públicos Em aberto, Em análise e Resolvido; etapas internas de atendimento separadas; Conquistas e Relatórios fora dos menus nesta fase. Não copiar de volta os diagnósticos e catálogos antigos presentes no documento do backend.
+
+### Regras de pontuação e reconhecimento
+
+1. Cada chamado terá pontos previstos, definidos por regras configuráveis. Solicitante não escolhe livremente pontos ou prioridade para aumentar crédito.
+2. Conclusão pelo técnico concede **crédito provisório único**. O chamado continua Em análise, com entrega aguardando confirmação; pontuação não resolve o chamado automaticamente.
+3. Confirmação/avaliação do solicitante torna o crédito **definitivo** e o chamado Resolvido. Mostrar separadamente saldo provisório e saldo confirmado.
+4. Pendência/reabertura produz ajuste auditável conforme política configurada, preservando entrega, avaliação e lançamentos anteriores. Não presumir fraude ou aplicar penalidade automática pela rejeição.
+5. Repetição de conclusão, retransmissão de evento e transferência não duplicam pontos. Uma reconclusão após pendência deve tratar o mesmo atendimento e seus ajustes de forma explicável, sem recriar integralmente o crédito.
+6. Cooperação registra papel, contribuição e divisão/bonificação explícita entre responsável e colaboradores. Não conceder integralmente o mesmo crédito a todos sem regra de distribuição.
+7. Regras consideram **qualidade, complexidade e colaboração**; pesos são configuráveis por perfil autorizado. Não premiar somente volume ou velocidade.
+8. Pausa por dependência externa, recusa voluntária e ausência de resposta a convite não geram penalidade automática. Falha de GPS não comprova ausência de trabalho.
+9. Ausência de confirmação exige política definida antes de ranking oficial; não converter automaticamente provisório em confirmado, fechar chamado ou inferir satisfação sem regra aprovada.
+
+### Rankings e períodos
+
+- Rankings **individual e por equipe**, com setor e período; incluir período mensal.
+- Novo período reinicia o placar daquele período sem apagar histórico; períodos anteriores continuam consultáveis.
+- Pontos provisórios e confirmados devem ser distinguíveis. A política exata de ordenação do placar e desempates ainda precisa ser definida; não presumir fórmula ou prioridade de desempate.
+- Tipo de chamado não é equipe. A gestão atual cadastra técnicos, secretarias e tipos autorizados, mas não demonstra um cadastro operacional de equipes e seus membros; definir esse vínculo antes de calcular ranking por equipe.
+- Cada resultado deve explicar de quais atendimentos, regras e ajustes veio. Preservar rastreabilidade da contribuição do principal e de colaboradores.
+
+### Experiência prevista no frontend e no mobile
+
+O jogo interno será apresentado por uma futura área **Ranking**, com placar individual/equipe, seleção de período e acompanhamento da própria contribuição. A apresentação deve distinguir previsto, provisório e confirmado e permitir entender o histórico dos lançamentos e ajustes. O planejamento individual foi entregue na seção 14; equipe e configuração continuam futuras.
+
+Menu Ranking habilitado para técnico e administrador na entrega da seção 14. A área administrativa de regras e o acesso aos rankings de equipe devem seguir permissões a definir. Usuário solicitante continua responsável por confirmar/avaliar a entrega; não recebe poder de editar pontos.
+
+Não reintroduzir automaticamente os menus Conquistas ou Relatórios: sua retirada foi autorizada e continua vigente. O plano do backend menciona conquistas como possibilidade da gamificação, mas critérios, formatos e acesso ainda não estão definidos. Eventual reconhecimento poderá ser apresentado dentro da experiência de Ranking após definição, sem exigir uma tela separada. Níveis, XP, medalhas, recompensas e metas não constam como regras especificadas na fonte consultada; não tratá-los como implementados ou aprovados.
+
+### Responsabilidade do backend e contrato a integrar
+
+O backend operacional deve calcular crédito, validar permissões, persistir regras/lançamentos, evitar duplicação e manter períodos/histórico. Web/mobile exibem esses resultados e decisões, sem calcular pontuação oficial de forma independente. Na fase atual, uma futura simulação local deve ser claramente identificada como mock.
+
+Antes de integrar, conferir o que o backend efetivamente oferece. O contrato deverá permitir representar período, participante/equipe, chamado e contribuição, pontos previstos/provisórios/confirmados, origem/motivo do lançamento, ajustes e regra aplicada. Esses são dados necessários ao planejamento, não nomes de endpoints ou DTOs existentes.
+
+### Decisões ainda pendentes
+
+- [ ] Valores de pontos por chamado e pesos de qualidade, complexidade e colaboração.
+- [ ] Cadastro de equipes/membros e regras de agregação do ranking de equipe.
+- [ ] Divisão/bonificação de colaboradores e ajuste em pendência/reabertura/reconclusão.
+- [ ] Ordenação do placar, desempates e tratamento de participantes sem pontos.
+- [ ] Datas, fuso e fechamento de períodos; período mensal é requisito, mas limites exatos não foram acordados.
+- [ ] Tratamento da ausência de confirmação e eventual encerramento excepcional.
+- [ ] Permissões de consulta/configuração e critérios de eventuais conquistas.
+- [ ] Se níveis, recompensas ou outros elementos de jogo farão parte de entrega futura.
+
+### Entregas e critérios de aceite
+
+- [x] Regras de ranking e gamificação do documento do backend incorporadas ao plano do frontend com referência à fonte.
+- [x] Preservados três status públicos, confirmação do solicitante e retirada de Conquistas/Relatórios.
+- [ ] Implementar primeiro com mocks identificados, conforme sequência da seção 9, depois integrar ao contrato conferido do backend.
+- [ ] Exibir saldo provisório/confirmado, placares individual/equipe, período e histórico explicável.
+- [ ] Demonstrar conclusão → provisório → confirmação → definitivo; pendência/reabertura mantém histórico e aplica ajuste auditável.
+- [ ] Demonstrar repetição/retransmissão/transferência sem crédito duplicado e cooperação sem duplicação integral.
+- [ ] Demonstrar novo período sem apagar placar anterior e regras ajustáveis com resultado explicável.
+- [ ] Validar permissões, cálculo, falhas, estados vazios e interface desktop/mobile antes de considerar entregue.
+
+Validação desta atualização: leitura e comparação dos documentos; nenhuma mudança no código ou novo teste de aplicação. A sequência atual permanece cooperação → perfil/foto → evidências → ranking/jogo interno. Remoção de menus feita anteriormente permanece como alteração local ainda não commitada.
+
+
+## 14. Ranking entregue no frontend — 09/10/2026
+
+Nova instrução: usuário solicitante não acessa ranking; técnico tem dashboard com pontos por chamado e placar; administrador acessa todos os resultados e filtra por técnico. Esta seção prevalece sobre planejamentos anteriores que deixavam Ranking como Em breve ou o colocavam apenas após as demais etapas. Cooperação, foto e evidências continuam pendentes.
+
+### Política adotada com autorização do usuário
+
+- Baixa: **10 pontos**; Normal: **20 pontos**; Alta: **40 pontos**. Regra demonstrativa prioridade-v1, sem prêmio por velocidade ou punição por pausa.
+- Crédito provisório na conclusão; confirmado na confirmação pelo solicitante. Pendência coloca crédito em revisão, fora dos dois saldos ativos, preservando lançamentos.
+- Reconclusão substitui o crédito em revisão do mesmo chamado, sem somar novamente. Um crédito corrente por chamado; auditoria preserva autor, beneficiário, horário, motivo e valor de cada revisão.
+- Crédito registra o técnico que concluiu e a prioridade/regra daquele momento. Transferência ou alteração de nome não transfere/recalcula crédito antigo; nova entrega registra seu executor.
+- Placar individual ordenado por pontos confirmados, com posições compartilhadas nos empates; nomes ordenam apenas a apresentação dos empatados. Técnicos sem pontos aparecem sem posição conquistada.
+- Período mensal definido pela data da conclusão em America/Sao_Paulo. Confirmação posterior confirma o crédito no mês da entrega. Todo o histórico continua consultável. Reconclusão usa sua nova data; revisão anterior permanece na auditoria.
+- Meta visual de incentivo: **100 pontos confirmados por mês**, sem penalidade e sem limitar acúmulo. Não é moeda ou recompensa operacional.
+
+### Acesso e experiência entregues
+
+- [x] Dashboard técnico /dashboard-tecnico, nova página inicial após login; saldo confirmado/provisório, entregas confirmadas, posição e progresso do mês.
+- [x] Ranking /ranking apenas para técnico/administrador; usuário redirecionado pela guarda e serviço rejeita consulta desse papel.
+- [x] Técnico vê placar agregado dos técnicos e somente seu detalhamento de créditos por chamado; sem filtro para investigar chamados de terceiros.
+- [x] Administrador vê tudo, filtra técnico e mês e consulta histórico de créditos. Filtro por técnico preserva posição no placar geral.
+- [x] Ranking habilitado nos menus desktop/mobile do técnico e administrador; acesso pelo dashboard administrativo. Conquistas e Relatórios continuam removidos.
+- [x] Pontos, versões e revisões persistidos junto ao chamado, na mesma gravação dos eventos/avisos. Falha de armazenamento preserva estado anterior.
+- [x] Exemplos e entregas anteriores com conclusão registrada recebem crédito demonstrativo reconstruído do histórico, explicitamente identificado. Autoria histórica atribuída ao responsável registrado; não é cálculo oficial ou inferência de colaboração.
+
+### Limites e próximas entregas
+
+Ranking individual entregue com mocks locais. Não implementados: ranking por equipe (cadastro de membros ainda pendente), divisão de colaboradores, configuração administrativa dos pesos, backend de pontuação, notificações de pontos, recompensas e calendário operacional configurável. Patentes foram implementadas posteriormente conforme seção 15. Credenciais/guardas continuam demonstrativas; não oferecem segurança de servidor. A API precisa persistir/corroborar regras e lançamentos antes de uso operacional.
+
+Validação desta etapa: npm run lint, npm run build, npm run check:ranking e npm run check:statuses aprovados. Verificações cobrem pesos, período/fuso, acesso por papel, detalhamento próprio, filtros/empates, provisório/confirmado/revisão, reconclusão sem duplicação, autoria e persistência/falhas. Build mantém aviso de bundle acima de 500 kB. Interface em navegador/celular continua pendente de validação visual.
+
+
+## 15. Patentes do jogo interno — 09/10/2026
+
+Catálogo ampliado e aprovado pelo usuário: **dez patentes militares**. Esta tabela substitui as quatro faixas iniciais. Limiares vigentes para a demonstração:
+
+| Patente | Pontos confirmados acumulados |
+|---|---|
+| Soldado raso | 0–99 |
+| Soldado | 100–249 |
+| Cabo | 250–499 |
+| Sargento | 500–799 |
+| Subtenente | 800–1.199 |
+| Tenente | 1.200–1.799 |
+| Capitão | 1.800–2.599 |
+| Major | 2.600–3.599 |
+| Coronel | 3.600–4.999 |
+| General | 5.000 ou mais |
+
+Patente usa a soma dos créditos confirmados de todo o histórico do técnico; não reinicia mensalmente e não depende do filtro de período do placar. Pontos provisórios e em revisão não contam. Crédito ajustado/revisado pode alterar a classificação: patente reflete o saldo confirmado atual, não um título irrevogável. Reconclusão não duplica crédito. A regra de prioridade permanece Baixa 10, Normal 20 e Alta 40.
+
+Técnico vê patente atual, pontos acumulados, progresso dentro da faixa e quantidade faltante para a próxima no dashboard/ranking. General é a faixa máxima, mas os pontos continuam acumulando. Placar mostra patente e saldo histórico de cada técnico junto aos resultados do período. Administrador consulta todas as patentes e, ao filtrar técnico, vê sua progressão; usuário solicitante continua sem acesso.
+
+Faixas/insígnias representam reconhecimento no jogo interno, não cargo, autorização ou hierarquia funcional municipal. Símbolos e cores têm rótulos textuais; progressão tem descrição acessível. Configuração operacional de limiares e validação no backend permanecem futuras. Não há novo menu de Conquistas ou Relatórios.
+
+- [x] Faixas e progresso implementados no frontend com dados mockados.
+- [x] Pontos históricos separados dos saldos mensais; filtros não reiniciam patente.
+- [x] Acesso por perfil preservado; administrador filtra técnico.
+- [ ] Integrar regra/cálculo ao backend e permitir configuração dos limiares quando necessário.
+
+Validação: npm run check:ranking, npm run lint e npm run build aprovados; verificados limiares exatos, progresso, faixa máxima, independência do mês e exclusão de créditos provisórios/em revisão. Build mantém aviso de bundle acima de 500 kB. Interface em navegador/celular permanece pendente de validação visual.
+
+
+### Ampliação das patentes — 09/10/2026
+
+Aplicadas dez faixas aprovadas pelo usuário: Soldado raso → Soldado → Cabo → Sargento → Subtenente → Tenente → Capitão → Major → Coronel → General. Catálogo, insígnias, progresso, testes e os três documentos de regras atualizados. General exige 5.000 pontos confirmados; os limiares anteriores foram substituídos, sem alterar os créditos dos chamados. A patente é recalculada automaticamente sobre o saldo existente. Validação desta ampliação: npm run check:ranking, npm run lint e npm run build aprovados, incluindo limites inferiores/superiores das dez faixas, progresso e General em 5.000 pontos. Validação visual em navegador/celular permanece pendente.

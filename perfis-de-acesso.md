@@ -5,7 +5,7 @@ Todas as contas são fictícias e as credenciais são públicas, exclusivas do p
 | Perfil | Nome | E-mail | Senha | Página inicial |
 |---|---|---|---|---|
 | Usuário da prefeitura | Ana Silva | usuario@demo.sjp | Usuario123! | /meus-chamados |
-| Técnico | Camila Santos | tecnico@demo.sjp | Tecnico123! | /minhas-missoes |
+| Técnico | Camila Santos | tecnico@demo.sjp | Tecnico123! | /dashboard-tecnico |
 | Administrador | Administrador Demo | admin@demo.sjp | Admin123! | /dashboard |
 
 ## Comportamento implementado
@@ -28,7 +28,7 @@ Guarda de rotas: `src/components/access/RequireAccess.tsx`.
 
 ## O que ainda falta
 
-Cadastro de chamado e ordem digital já foram entregues com persistência local. Aceite, fila operacional, eventos, início/pausa/bloqueio/retomada, cronômetro e conclusão também já foram entregues. Validação/avaliação do solicitante e análise/devolução administrativa também estão implementadas. Edição de perfil/foto, evidências, cooperação, lembretes, push/GPS e ranking continuam pendentes. Itens sem implementação aparecem como “Em breve”. Dashboard administrativo e listas utilizam a mesma base local compartilhada.
+Cadastro de chamado e ordem digital já foram entregues com persistência local. Aceite, fila operacional, eventos, início/pausa/bloqueio/retomada, cronômetro e conclusão também já foram entregues. Validação/avaliação do solicitante e análise/devolução administrativa também estão implementadas. Edição de perfil/foto, evidências, cooperação, lembretes, push/GPS e ranking por equipe continuam pendentes. Ranking individual e dashboard técnico já estão implementados com mocks. Itens sem implementação aparecem como “Em breve”. Dashboard administrativo e listas utilizam a mesma base local compartilhada.
 
 Essas guardas simulam a experiência e não oferecem segurança real: dados e senhas estão disponíveis no navegador. Futuramente, autenticação e autorização deverão ser aplicadas pelo backend. Não usar senhas reais neste protótipo.
 ## Cadastro e persistência
@@ -70,3 +70,17 @@ Para testar, gerar novo chamado e alternar entre contas no mesmo navegador. Avis
 ## Status atuais do chamado
 
 Somente Em aberto, Em análise e Resolvido. A execução e a validação seguem etapas internas; concluir pelo técnico mantém Em análise e confirmar pelo solicitante marca Resolvido. Filtros de chamados usam os três status; ações continuam respeitando papel, responsabilidade e etapa interna.
+
+
+## Acesso ao ranking — 09/10/2026
+
+- Usuário: sem menu, rota ou consulta autorizada de ranking.
+- Técnico: página inicial /dashboard-tecnico; Ranking /ranking com placar agregado e detalhamento somente dos próprios pontos/chamados.
+- Administrador: Ranking /ranking com todos os resultados e filtros por técnico e mês, acessível pelo dashboard e pelo menu.
+
+Baixa 10, Normal 20, Alta 40 pontos; provisórios na conclusão, confirmados pelo solicitante, em revisão quando há pendência. Repetir entrega não duplica pontos do chamado. Aplicar somente a dados fictícios; segurança operacional depende do backend.
+
+
+## Patentes
+
+Técnico vê sua progressão e as patentes no placar; administrador consulta todos e filtra técnico; usuário não tem acesso. Faixas vigentes: Soldado raso (0–99), Soldado (100–249), Cabo (250–499), Sargento (500–799), Subtenente (800–1.199), Tenente (1.200–1.799), Capitão (1.800–2.599), Major (2.600–3.599), Coronel (3.600–4.999), General (5.000 ou mais). Somente pontos confirmados acumulados, sem reinício mensal. Patente não altera perfil, cargo ou permissões.

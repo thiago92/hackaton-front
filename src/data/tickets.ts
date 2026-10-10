@@ -4,6 +4,7 @@ export const ticketStatuses = ['Em aberto', 'Em análise', 'Resolvido'] as const
 export type TicketStatus = typeof ticketStatuses[number]
 export type Priority = 'Baixa' | 'Normal' | 'Alta'
 export interface Ticket {
+  score?: import('@/lib/ticket-scoring').TicketScore
   positions?: import('@/data/mock-positions').MockPosition[]
   proximityInvitees?: string[]
   notices?: TicketNotice[]

@@ -23,7 +23,7 @@ Veja [perfis-de-acesso.md](./perfis-de-acesso.md) para credenciais, rotas e perm
 - [x] Labels, nomes acessíveis, estados textuais e link para o conteúdo em partes da interface.
 - [x] Assistente de IA retirado dos menus desktop/mobile e menção à IA removida do login. IA fora do escopo da interface nesta fase.
 
-**Limitações atuais:** sessão e guardas são apenas simulações locais, sem segurança de backend; dashboard e listas agora usam a mesma base mockada persistida; aceite, início, eventos, pausa/bloqueio, cronômetro e conclusão já estão implementados com mocks; validação/avaliação do solicitante e análise/devolução administrativa também estão implementadas; ainda faltam cooperação, evidências, push, GPS real e ranking. Técnicos está habilitado; Conquistas e Relatórios permanecem desabilitados. Responsividade não comprova um aplicativo capaz de capturar GPS em segundo plano.
+**Limitações atuais:** sessão e guardas são apenas simulações locais, sem segurança de backend; dashboard e listas agora usam a mesma base mockada persistida; aceite, início, eventos, pausa/bloqueio, cronômetro e conclusão já estão implementados com mocks; validação/avaliação do solicitante e análise/devolução administrativa também estão implementadas; ainda faltam cooperação, evidências, push, GPS real e ranking por equipe/configuração. Ranking individual e dashboard técnico já entregues com mocks. Técnicos está habilitado; Conquistas e Relatórios foram retirados dos menus nesta fase. Responsividade não comprova um aplicativo capaz de capturar GPS em segundo plano.
 
 ## Regras que orientam a implementação
 
@@ -208,6 +208,8 @@ Variáveis `VITE_*` são públicas no navegador: não armazenar segredos. Defini
 |---|---|
 | / e /login | Login demonstrativo |
 | /meus-chamados | Chamados do usuário |
+| /dashboard-tecnico | Dashboard do técnico com pontuação e ranking |
+| /ranking | Ranking e pontos; técnico e administrador, com filtro administrativo |
 | /minhas-missoes | Chamados do técnico e disponíveis da secretaria |
 | /perfil | Perfil somente leitura da conta conectada |
 | /tecnicos | Gestão mockada dos técnicos pelo administrador |
@@ -421,3 +423,32 @@ Build desta retomada: aprovado; permanece o aviso de bundle acima de 500 kB. Pre
 Catálogo vigente: **Em aberto, Em análise e Resolvido**. Cadastro → Em aberto; assumir/atribuir → Em análise; confirmar pelo solicitante → Resolvido. Execução, pausa/bloqueio, espera de validação e análise administrativa são etapas internas do atendimento, separadas em executionState. Conclusão do técnico mantém Em análise até a confirmação. Kanban tem três colunas e filtros de status usam somente esse catálogo.
 
 Dados locais antigos são migrados preservando a etapa original, histórico, intervalos, responsáveis e avisos. Referências anteriores aos oito estados são históricas ou descrevem etapas de atendimento. Regras completas na seção 11 do plano. Validação desta mudança: lint, build e npm run check:statuses aprovados (migração dos oito estados, recarga, dados inválidos/falha de gravação, permissões, uma execução ativa, pausa/bloqueio, posições, conclusão, pendência, devolução e confirmação). Verificação visual em navegador/celular permanece pendente; build mantém aviso de bundle acima de 500 kB.
+
+
+## Menus de Conquistas e Relatórios — 09/10/2026
+
+Conquistas e Relatórios removidos dos menus desktop/mobile por decisão do usuário. O dashboard continua como acompanhamento inicial. Pontos e ranking permanecem planejados; a remoção do menu não conclui nem cancela a gamificação. Ranking do técnico era Em breve nesta etapa; agora foi habilitado conforme a entrega abaixo.
+
+
+## Planejamento do jogo interno e ranking — 09/10/2026
+
+Regras alinhadas ao plano do backend (commit 98e24e0) na [seção 13 do plano](ANALISE_FRONTEND_E_PLANO_DE_IMPLEMENTACAO.md#13-ranking-e-gamificação-como-jogo-interno--alinhamento-com-backend-09102026). Gamificação prevista: crédito provisório na conclusão, confirmado pelo solicitante, rankings individual/equipe por período, histórico preservado e ajustes sem duplicação. Registro anterior ao desenvolvimento: o commit do backend consultado adiciona documentação, sem comprovar API operacional. Ranking individual implementado posteriormente conforme a entrega abaixo. Pesos demonstrativos e empate definidos na entrega abaixo; equipes, divisão de colaboração e configuração operacional continuam pendentes. Conquistas/Relatórios continuam fora dos menus; Ranking do técnico foi habilitado na entrega abaixo.
+
+
+## Ranking e dashboard técnico entregues — 09/10/2026
+
+Ranking habilitado para técnico/administrador; usuário solicitante não tem acesso. Técnico entra em /dashboard-tecnico e vê seus pontos por chamado, posição no placar agregado e meta visual de 100 pontos confirmados/mês. /ranking oferece a mesma visão; administrador consulta todos os créditos e filtra por técnico e mês.
+
+Baixa = 10, Normal = 20, Alta = 40 pontos. Concluir gera provisório; confirmação do solicitante confirma; pendência coloca em revisão. Reconclusão substitui crédito do mesmo chamado sem duplicar. Período é o mês da conclusão (America/Sao_Paulo); placar por confirmados, com empate compartilhado. Crédito guarda executor, prioridade e regra; transferência não muda autoria da entrega pontuada. Histórico/revisões persistem na base de chamados.
+
+Exemplos antigos recebem crédito de demonstração reconstruído do histórico, identificado nas revisões. Cooperação, fotos, evidências, ranking por equipe e API operacional permanecem futuros. Conquistas/Relatórios continuam fora dos menus. Esta atualização prevalece sobre notas anteriores de Ranking Em breve. Regras detalhadas na seção 14 do plano.
+
+Validação: npm run lint, npm run build, npm run check:ranking e npm run check:statuses aprovados. Verificações cobrem pesos, período/fuso, acesso por papel, detalhamento próprio, filtros/empates, provisório/confirmado/revisão, reconclusão sem duplicação, autoria e persistência/falhas. Build mantém aviso de bundle acima de 500 kB.
+
+
+## Patentes do jogo interno — 09/10/2026
+
+Dez patentes: Soldado raso (0–99), Soldado (100–249), Cabo (250–499), Sargento (500–799), Subtenente (800–1.199), Tenente (1.200–1.799), Capitão (1.800–2.599), Major (2.600–3.599), Coronel (3.600–4.999), General (5.000 ou mais). Patente é calculada pelos pontos confirmados de todo o histórico e não reinicia com o mês. Dashboard/ranking mostram patente, progresso e pontos faltantes; administrador vê tudo e filtra técnico. Usuário não acessa. Créditos provisórios/em revisão não contam; ajustes podem alterar a faixa. General continua acumulando pontos. Regras completas na seção 15 do plano. Validação: npm run check:ranking, npm run lint e npm run build aprovados; verificados limiares exatos, progresso, faixa máxima, independência do mês e exclusão de créditos provisórios/em revisão. Build mantém aviso de bundle acima de 500 kB.
+
+
+Ampliação aprovada: dez patentes, conforme catálogo da seção 15 do plano. Pontos existentes preservados; patente e progresso são recalculados com os novos limiares. Validação: npm run check:ranking, npm run lint e npm run build aprovados, incluindo limites inferiores/superiores das dez faixas, progresso e General em 5.000 pontos. Validação visual em navegador/celular permanece pendente.

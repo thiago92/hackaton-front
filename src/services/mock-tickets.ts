@@ -1,3 +1,4 @@
+import { withLegacyScore, validTicketScore, concludeScore, reviewScore } from '@/lib/ticket-scoring'
 import { executionStates, normalizeStoredTicket, statusForExecution, withTicketStatus } from '@/lib/ticket-status'
 import { recordDemoPosition, validPosition, proximityEligible } from '@/data/mock-positions'
 import { appendTicketNotices } from '@/data/notification-rules'
@@ -12,7 +13,7 @@ type Snapshot = { tickets: Ticket[]; error: string | null }
 const listeners = new Set<() => void>()
 function withCallType(ticket: Ticket): Ticket {
   const callType = normalizeCallType(ticket.callType ?? ticket.area ?? ticket.team)
-  return { ...withTicketStatus(ticket), technicianId: ticket.technicianId ?? readTechnicians().technicians.find(tech => tech.name === ticket.technician)?.id ?? ({ 'Camila Santos': 'tecnico-demo', 'Pedro Almeida': 'tecnico-redes-demo', 'Equipe de estoque': 'tecnico-estoque-demo' } as Record<string, string>)[ticket.technician ?? ''], callType, area: callType, team: callType }
+  return withLegacyScore({ ...withTicketStatus(ticket), technicianId: ticket.technicianId ?? readTechnicians().technicians.find(tech => tech.name === ticket.technician)?.id ?? ({ 'Camila Santos': 'tecnico-demo', 'Pedro Almeida': 'tecnico-redes-demo', 'Equipe de estoque': 'tecnico-estoque-demo' } as Record<string, string>)[ticket.technician ?? ''], callType, area: callType, team: callType })
 }
 function seeds(): Ticket[] {
   return [...mockTickets, ...additionalDemoTickets].map(ticket => ({ ...withCallType(ticket), requesterId: demoAccounts.find(account => account.name === ticket.requester)?.id }))
@@ -23,6 +24,7 @@ function validTicket(value: unknown): value is Ticket {
   return Number.isSafeInteger(item.id) && Number(item.id) > 0
     && ['title', 'description', 'createdAt', 'requester', 'extension', 'secretary', 'department', 'location', 'team', 'category'].every(key => typeof item[key] === 'string')
     && Number.isFinite(Date.parse(String(item.createdAt)))
+    && (item.score === undefined || validTicketScore(item.score))
     && ticketStatuses.includes(item.status as Ticket['status'])
     && executionStates.includes(item.executionState as Ticket['executionState'])
     && item.status === statusForExecution(item.executionState as Ticket['executionState'])
@@ -179,7 +181,7 @@ export async function actOnMockTicket(id: number, input: TechnicianActionInput):
     ticket = recordDemoPosition(ticket, Date.parse(now))
     ticket.history.push({ at: now, author: actor!.name, text: message })
     if (input.action === 'assumir') ticket = appendTicketNotices(ticket, 'vinculo', now)
-    if (input.action === 'concluir') ticket = appendTicketNotices(ticket, 'conclusao', now)
+    if (input.action === 'concluir') { ticket = concludeScore(ticket, actor!, now); ticket = appendTicketNotices(ticket, 'conclusao', now) }
     const updated = latest.tickets.map(item => item.id === id ? withTicketStatus(ticket) : item)
     try { window.localStorage.setItem(ticketsStorageKey, JSON.stringify(updated)) }
     catch { throw new Error('Não foi possível salvar a alteração. O estado anterior foi preservado; tente novamente.') }
@@ -231,6 +233,7 @@ export async function validateMockTicket(id: number, input: ValidationInput): Pr
       } else { throw new Error('Ação de validação inválida.') }
     }
     ticket.history.push({ at: now, author: actor!.name, text: event })
+    if (input.action === 'confirmar' || input.action === 'pendencia') ticket = reviewScore(ticket, actor!, now, input.action === 'confirmar' ? 'confirmado' : 'em_revisao')
     if (input.action === 'pendencia') ticket = appendTicketNotices(ticket, 'pendencia', now)
     if (input.action === 'devolver') ticket = appendTicketNotices(ticket, 'devolucao', now)
     const updated = latest.tickets.map(item => item.id === id ? withTicketStatus(ticket) : item)

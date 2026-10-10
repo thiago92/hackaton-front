@@ -1,3 +1,4 @@
+import Ranking from '@/pages/ranking/Index'
 import TechnicianMap from '@/pages/technician-map/Index'
 import Notifications from '@/pages/notifications/Index'
 import Technicians from '@/pages/technicians/Index'
@@ -23,6 +24,7 @@ export default function AppRouter() {
         <Route path="/login" element={<Login />} />
         <Route element={<RequireAccess />}>
           <Route element={<DashboardLayout />}>
+            <Route element={<RequireAccess roles={['tecnico', 'administrador']} />}><Route path="/ranking" element={<Ranking />} /></Route>
             <Route path="/notificacoes" element={<Notifications />} /><Route path="/perfil" element={<Profile />} /><Route element={<RequireAccess roles={['usuario', 'administrador']} />}><Route path="/novo-chamado" element={<NewTicket />} /></Route>
             <Route element={<RequireAccess roles={['administrador']} />}>
               <Route path="/mapa-tecnicos" element={<TechnicianMap />} /><Route path="/tecnicos" element={<Technicians />} /><Route path="/dashboard" element={<Dashboard />} />
@@ -32,7 +34,7 @@ export default function AppRouter() {
               <Route path="/meus-chamados" element={<MyTickets />} />
             </Route>
             <Route element={<RequireAccess roles={['tecnico']} />}>
-              <Route path="/minhas-missoes" element={<MyTickets />} />
+              <Route path="/dashboard-tecnico" element={<Ranking dashboard />} /><Route path="/minhas-missoes" element={<MyTickets />} />
             </Route>
           </Route>
         </Route>

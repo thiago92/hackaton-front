@@ -110,4 +110,5 @@ async function run() {
   h.window.localStorage.setItem = write;
   console.log('PASS: atribuição e falha de armazenamento sem publicar estado parcial.');
 }
-run().catch(error => { console.error(error); process.exitCode = 1; });
+module.exports = { harness };
+if (require.main === module) run().catch(error => { console.error(error); process.exitCode = 1; });
