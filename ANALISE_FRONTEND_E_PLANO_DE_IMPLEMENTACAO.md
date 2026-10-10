@@ -2,13 +2,26 @@
 
 Análise inicial e consolidação: 09/10/2026. Documento compartilhado de regras para **backend, frontend web e aplicativo mobile**, mantido em `Hackaton_frontend/ANALISE_FRONTEND_E_PLANO_DE_IMPLEMENTACAO.md`. Base do frontend: commit `f8a63e5`; simplificação dos status aplicada após `fd74597`, conforme seção 11.
 
+## Atualização vigente — alinhamento com o backend em 10/10/2026
+
+Fonte das alterações: [plano do backend](../Hackaton-backend/ANALISE_FRONTEND_E_PLANO_DE_IMPLEMENTACAO.md), especialmente a seção 10 e a atualização de status. As regras importadas na [seção 16](#16-alinhamento-com-as-atualizações-do-backend--10102026) prevalecem sobre as regras de 09/10 quando houver conflito. O [README do backend](../Hackaton-backend/README.md) registra execução, validações e pendências desse projeto.
+
+- Prefeitura é o tenant; unidade e vínculo técnico-unidade substituem secretaria como critério de responsabilidade e acesso. Não criar entidade Secretarias.
+- Abertura por unidade prevê atribuição imediata a um único responsável elegível e aviso de vínculo, sem iniciar execução. A política para vários candidatos ainda precisa ser definida.
+- Status públicos vigentes: **Aberto, Em Análise e Resolvido**. Etapas de atendimento permanecem separadas.
+- Eventos operacionais e comentários são registros distintos; colaboradores não substituem o responsável principal.
+- Conclusão exige imagem FotoEntrega com upload efetivamente concluído e validado pelo backend.
+- Prioridade será definida por agente de IA futuro; matriz manual não é tarefa imediata.
+
+**Alcance desta alteração:** somente este documento do frontend. O trabalho de código permanece restrito ao backend; a integração e adaptação do frontend ficam para depois. O frontend atual ainda usa mocks por secretaria, status Em aberto/Em análise/Resolvido e conclusão sem foto. Os registros das funcionalidades entregues e dos testes anteriores permanecem históricos; esta revisão não entrega as novas regras no frontend.
+
 ## 1. Escopo e diagnóstico
 
 O produto atende inicialmente demandas de TI dos órgãos municipais. Este documento define o comportamento de negócio comum aos três projetos. O frontend já demonstra a jornada operacional com serviços mockados e persistência no navegador. Isso não comprova implementação no backend ou no aplicativo mobile: esses projetos não foram auditados nesta revisão.
 
 Referências originais: [manual do hackathon](../Manual_Hackathon_SJP_A5%20(1).pdf) e foto da ordem de serviço na pasta superior. As regras informadas pelo usuário prevalecem sobre a análise inicial; diferenças frente ao manual permanecem registradas. O [README](README.md) registra execução e andamento do frontend e [perfis-de-acesso.md](perfis-de-acesso.md) descreve contas de demonstração.
 
-**Como manter:** atualizar regra e situação no mesmo momento da entrega. Marcar como entregue apenas o comportamento verificado, indicando a camada e se usa mocks. Decisão proposta não é decisão aprovada; checklist de integração não deve ser concluído por uma simulação local. As seções 4A–4C definem regras; 4B e 9 registram implementação; 5–7 orientam entrega operacional e apresentação.
+**Como manter:** atualizar regra e situação no mesmo momento da entrega. Marcar como entregue apenas o comportamento verificado, indicando a camada e se usa mocks. Decisão proposta não é decisão aprovada; checklist de integração não deve ser concluído por uma simulação local. As seções 4A–4C registram regras e refinamentos; 4B e 9 registram implementação; 5–7 orientam entrega operacional e apresentação. A atualização de 10/10 e a seção 16 prevalecem sobre referências antigas a secretaria, status, atribuição e prioridade.
 
 ## 2. O que foi implementado no frontend
 
@@ -16,7 +29,7 @@ Referências originais: [manual do hackathon](../Manual_Hackathon_SJP_A5%20(1).p
 |---|---|---|---|
 | Base e navegação | React/TypeScript/Vite, layout responsivo, menus por perfil e rotas protegidas na demonstração | `src/routes.tsx`, `src/components/access/RequireAccess.tsx` | Sem segurança operacional aplicada pelo backend |
 | Sessão | Credenciais fictícias verificadas, sessão por aba, logout e página inicial por papel | `src/data/access-profiles.ts` | Sessão demonstrativa; senhas públicas no navegador |
-| Cadastro e ordem digital | Usuário abre para si; administrador abre para solicitante autorizado; dados da unidade, classificação, impacto, urgência, equipamento/material | `src/pages/new-ticket/Index.tsx`, `src/services/mock-tickets.ts` | Catálogo fictício; matriz de prioridade ainda pendente |
+| Cadastro e ordem digital | Usuário abre para si; administrador abre para solicitante autorizado; dados da unidade, classificação, impacto, urgência, equipamento/material | `src/pages/new-ticket/Index.tsx`, `src/services/mock-tickets.ts` | Catálogo fictício; priorização por agente de IA futura, sem matriz manual nesta fase |
 | Dados compartilhados | Cadastro, dashboard, chamados e missões usam a mesma base local | `src/hooks/use-tickets.ts` | Compartilhamento entre abas da mesma origem/navegador, não entre dispositivos |
 | Consulta | Kanban/tabela, busca, filtros por secretaria/tipo/prioridade e número; missões e chamados do próprio usuário | `src/pages/tickets/Index.tsx`, `src/pages/my-tickets/Index.tsx` | Arraste desloca a visualização do Kanban, não muda estado do chamado |
 | Execução | Assumir, fila, início, eventos, pausa categorizada, bloqueio, retomada, tempo ativo e conclusão | `src/components/tickets/TechnicianActions.tsx`, `src/lib/ticket-execution.ts` | Uma execução ativa por responsável; colaboradores ainda não implementados |
@@ -46,7 +59,7 @@ Referência histórica: manual, páginas 21–23. Esta avaliação é do fronten
 3. Cooperação aprovada em chamado já assumido, foto/perfil editável, anexos/evidências, ranking por equipe/configuração e IA permanecem pendentes. Ranking individual por técnico foi entregue no mock (seção 14). Relatórios completos ficam para etapa posterior; o dashboard atende ao acompanhamento inicial.
 4. GPS real, push, tratamento de segundo plano e política de plantão/escalonamento não foram demonstrados. Posições fictícias não comprovam deslocamento ou execução.
 5. Contrato atual ainda contém campos legados em texto; unidades, catálogos, participantes e timestamps precisam de contrato operacional com IDs e validação no servidor.
-6. Matriz de prioridade por impacto/urgência não está implementada: usuário abre com Normal; administrador escolhe Baixa/Normal/Alta no cadastro.
+6. Priorização por agente de IA permanece futura; não desenvolver matriz manual nesta etapa. No mock atual, usuário abre com Normal e administrador escolhe Baixa/Normal/Alta. Contrato de avaliação/histórico do agente ainda precisa ser estruturado no backend.
 7. Mapa depende de tiles externos por padrão; configurar/documentar o funcionamento municipal. Lint/build e verificações de serviço não substituem validação visual em desktop/celular, ainda pendente.
 8. Build aprovado com aviso de bundle acima de 500 kB; otimização por rotas permanece avaliação futura.
 
@@ -58,8 +71,8 @@ Esta seção consolida as regras de negócio atuais para backend, web e mobile. 
 
 - **Tipo de chamado:** catálogo vigente **Aquisição/Estoque, Suporte de TI, Redes e TI**. Classifica o serviço; não identifica equipe, técnico ou secretaria. O cadastro, filtro, ordem e distribuição do dashboard usam esse conceito.
 - **Natureza:** Hardware ou Software, independente do tipo. Demanda mista permanece decisão pendente.
-- **Secretaria:** órgão atendido e vínculo de responsabilidade do técnico. Um técnico pode atender várias secretarias e vários tipos.
-- **Departamento/unidade:** subdivisão e local físico da secretaria. O solicitante escolhe uma unidade autorizada, da qual vêm secretaria e departamento.
+- **Prefeitura:** cliente/tenant; usuários, técnicos, unidades e chamados pertencem à mesma prefeitura e devem permanecer isolados. Não criar tabela Secretarias. Secretaria é somente referência histórica dos mocks atuais.
+- **Unidade de atendimento:** ponto de atendimento da prefeitura, com nome, endereço e coordenadas. Técnico atende uma ou mais unidades; unidade pode ter vários técnicos por TecnicoUnidadeAtendimento. O solicitante escolhe uma unidade autorizada por ID. Departamento/secretaria continuam somente nos mocks legados até a integração.
 - **Modalidade:** Presencial ou Remoto. Proximidade não é critério de convite em atendimento remoto.
 
 Nomenclaturas anteriores são históricas. Migração do frontend: Suporte → Suporte de TI; Telecom → Redes; TI / Sistemas → TI; Aquisições / Estoque → Aquisição/Estoque. Campo vigente: `callType`; `area`/`team` permanecem compatíveis nesta fase, sem representar membros de equipe. Normalizar sem perder IDs, estado ou histórico. Todas as quatro opções aparecem no filtro mesmo sem chamados do tipo.
@@ -86,7 +99,7 @@ Prioridade e pontos devem seguir regra configurada, sem permitir que o solicitan
 
 ### Vínculo, execução, pausa e tempo
 
-**Status vigentes do chamado: Em aberto, Em análise e Resolvido.** Cadastro inicia Em aberto; assunção/atribuição passa para Em análise; confirmação do solicitante passa para Resolvido. Vínculo, execução, pausa, bloqueio, espera de validação e análise administrativa são etapas internas do atendimento, não novos status. O fluxo operacional permanece **Aberto → Vinculado → Em andamento ↔ Pausado/Bloqueado → Aguardando validação → Resolvido**, separado do status do chamado. Bloqueado interrompe execução e registra impedimento. Se o solicitante informa pendência: **Aguardando validação → Aguardando análise → Vinculado** (com responsável) ou **Aberto** (sem responsável), após análise/devolução administrativa. Devolução não inicia atendimento automaticamente.
+**Status vigentes do chamado: Aberto, Em Análise e Resolvido.** Cadastro sem responsável inicia Aberto; assunção/atribuição passa para Em Análise; confirmação do solicitante passa para Resolvido. O código do frontend ainda usa a grafia anterior; sua adaptação permanece pendente. Vínculo, execução, pausa, bloqueio, espera de validação e análise administrativa são etapas internas do atendimento, não novos status. O fluxo operacional permanece **Aberto → Vinculado → Em andamento ↔ Pausado/Bloqueado → Aguardando validação → Resolvido**, separado do status do chamado. Bloqueado interrompe execução e registra impedimento. Se o solicitante informa pendência: **Aguardando validação → Aguardando análise → Vinculado** (com responsável) ou **Aberto** (sem responsável), após análise/devolução administrativa. Devolução não inicia atendimento automaticamente.
 
 - Vincular/aceitar não inicia automaticamente o cronômetro nem a captura; ação “Iniciar” abre sessão de execução.
 - Tela de disponíveis permite assumir chamado da responsabilidade do técnico ou oportunidade de cooperação autorizada.
@@ -107,7 +120,9 @@ Coleta de 10 minutos pode não detectar rapidamente a chegada ao hospital. É po
 
 Captura em segundo plano é requisito a verificar em aparelho real. Não se pressupõe que a atual aplicação React responsiva consiga manter GPS com tela bloqueada; escolher solução mobile após prova funcional e registrar limitações.
 
-### Nova regra: notificar por secretaria OU por proximidade
+### Avisos por secretaria/proximidade — histórico do mock de 09/10
+
+**Regra operacional substituída em 10/10:** usar responsabilidade por unidade, vínculo técnico-unidade e proximidade válida dentro da prefeitura, conforme seção 16. A tabela abaixo descreve os mocks existentes; não implementar secretaria como critério no contrato operacional.
 
 Em todas as linhas abaixo, exigir tipo compatível. Para convite de outra secretaria, exigir também disponibilidade informada Disponível; isso não impede estar ocupado e aceitar para fila.
 
@@ -228,13 +243,13 @@ Deduplicar por evento/chamado/técnico, agrupar avisos comuns quando configurado
 
 Para chamado já assumido, “Oferecer ajuda” cria solicitação de colaboração. Responsável ou administrador aceita; o responsável principal permanece até transferência explícita e auditada. Registrar colaboradores e atividades realizadas. Recusar colaboração não reduz pontuação. Notificações pendentes devem abrir o estado atual, inclusive se chamado já foi resolvido ou transferido.
 
-### Prioridade por impacto e urgência
+### Priorização por agente de IA — integração futura
 
-Solicitante informa impacto e urgência; regra configurada sugere prioridade e administrador confirma/altera com justificativa. Considerar interrupção de serviço essencial, quantidade de usuários afetados e alternativa operacional. Não atribuir alta prioridade apenas porque o usuário selecionou “urgente”.
+A prioridade será definida por um agente de IA a integrar posteriormente. Impacto, urgência informada, descrição, tipo, unidade, pessoas afetadas e alternativa operacional devem permanecer disponíveis como entradas; o solicitante não controla livremente a prioridade final. Não implementar matriz manual ou agente nesta fase.
 
-Configurar prazo de resposta/assunção, alerta por ausência de candidato e escalonamento ao administrador/plantão. Distinguir prazo até primeiro atendimento de duração de execução. Atraso do push não muda o timestamp de abertura.
+O portal atual do backend usa Normal na abertura. Estrutura futura proposta: interface no backend, resultado com prioridade e justificativa, origem/versão e histórico, tratamento de indisponibilidade e reprocessamento idempotente. Essa estrutura ainda não foi entregue. A avaliação de IA não cria novos status do chamado nem inicia atendimento automaticamente.
 
-Não interromper automaticamente outra tarefa. Administrador autoriza eventual troca por urgência, registra justificativa e mantém responsável/plano de continuidade do chamado interrompido. Cooperação entre secretarias permanece voluntária. Atribuição automática é possibilidade futura configurável, não regra adotada neste plano.
+Atribuição por unidade é uma regra separada da priorização: está prevista, mas ainda não implementada. Validar vínculo, elegibilidade e disponibilidade; registrar um responsável principal, evento e aviso, sem iniciar tempo. Política de múltiplos candidatos, plantão e escalonamento permanece pendente.
 
 ### Pausa e indicadores de tempo
 
@@ -272,7 +287,7 @@ Conceder pontos provisórios únicos na conclusão e definitivos na confirmaçã
 | Eventos separados de aviso/vínculo/início | Sem persistência operacional | Contratos/eventos auditados e transições autorizadas |
 | Disponibilidade independente | Cadastro e ocupação separados no mock | Turnos/plantão, conectividade e sincronização operacional |
 | Cooperação em chamado assumido | Não implementada | Oferta, aprovação, participantes e transferência explícita |
-| Prioridade por impacto/urgência | Campos registrados; Normal para usuário e escolha administrativa no cadastro | Matriz configurável, alteração justificada e escalonamento |
+| Prioridade por agente de IA | Campos informados no mock; Normal para usuário e escolha administrativa no cadastro | Contrato/histórico de avaliação e integração futura do agente; sem matriz manual nesta etapa |
 | Pausa categorizada | Motivos, intervalos e tempo ativo persistidos no mock | Persistência operacional e indicadores ampliados de espera/execução |
 | Confirmação sem resposta | Não implementada | Lembretes, alerta administrativo e estado pendente |
 | Crédito provisório/confirmado | Crédito único por chamado e revisões persistidos no mock; ranking individual com saldos separados | Backend, divisão de colaboradores e regras configuráveis |
@@ -323,7 +338,7 @@ P0: jornada e infraestrutura de atendimento. P1: demais requisitos obrigatórios
 ### Passo 4 — Cadastrar e atribuir demandas; configurar equipes [P0]
 
 - [ ] Criar formulário para usuário da prefeitura e administrador autorizados: descrição, solicitante, secretaria, departamento, unidade/local, área de atendimento, hardware/software, modalidade remota/presencial, equipamento quando aplicável e prioridade conforme permissão.
-- [ ] Validar campos e impedir envio duplicado; incluir impacto, urgência, contato, necessidade de material e retirada; aplicar matriz de prioridade com alteração administrativa justificada.
+- [ ] Validar campos e impedir envio duplicado; incluir impacto, urgência, contato, necessidade de material e retirada; preservar dados de impacto/urgência para a futura priorização por agente de IA, sem implementar matriz manual nesta etapa.
 - [ ] Criar configuração mínima de setores, equipes, membros, tipos de tarefa e fluxos.
 - [ ] Permitir atribuição a pessoa ou equipe e registrar mudanças de responsável.
 - [ ] Demonstrar chamados nos tipos Aquisição/Estoque, Suporte de TI, Redes e TI, em secretarias diferentes. Preservar configuração genérica para a exigência do manual; a demonstração fora da TI permanece pendência de compatibilidade, não escopo confirmado do produto.
@@ -391,9 +406,9 @@ P0: jornada e infraestrutura de atendimento. P1: demais requisitos obrigatórios
 
 **Aceite:** regras ajustáveis alteram resultado demonstrável; novo período reinicia placar e mantém consulta ao anterior.
 
-### Passo 10 — Integrar aplicação útil de IA [P1, obrigatório no manual; fora da interface nesta fase]
+### Passo 10 — Integrar agente de IA para priorização [entrega futura]
 
-Decisão atual do produto: assistente de IA retirado dos menus desktop/mobile e menção removida do login. Não reintroduzir IA nesta fase do frontend apenas por este checklist. O manual exige uma aplicação útil de IA; manter essa diferença documentada e alinhar o escopo da entrega final antes de implementar. Os itens abaixo são o caminho de compatibilidade futura com o manual.
+Decisão atual do produto: assistente de IA retirado dos menus desktop/mobile e menção removida do login. Não reintroduzir IA nesta fase do frontend apenas por este checklist. O manual exige uma aplicação útil de IA; manter essa diferença documentada e alinhar o escopo da entrega final antes de implementar. A função agora definida pelo usuário é priorização de chamados; o agente será integrado depois. Itens antigos de sugestão de categoria/equipe abaixo são referências históricas de compatibilidade com o manual, não tarefas imediatas nem funções aprovadas para substituir a priorização.
 
 - [ ] Escolher função concreta, como sugerir categoria/equipe e apontar dados faltantes no cadastro.
 - [ ] Exibir sugestão, justificativa e opções aceitar/editar/recusar, com erro/carregamento.
@@ -727,3 +742,110 @@ Validação: npm run check:ranking, npm run lint e npm run build aprovados; veri
 ### Ampliação das patentes — 09/10/2026
 
 Aplicadas dez faixas aprovadas pelo usuário: Soldado raso → Soldado → Cabo → Sargento → Subtenente → Tenente → Capitão → Major → Coronel → General. Catálogo, insígnias, progresso, testes e os três documentos de regras atualizados. General exige 5.000 pontos confirmados; os limiares anteriores foram substituídos, sem alterar os créditos dos chamados. A patente é recalculada automaticamente sobre o saldo existente. Validação desta ampliação: npm run check:ranking, npm run lint e npm run build aprovados, incluindo limites inferiores/superiores das dez faixas, progresso e General em 5.000 pontos. Validação visual em navegador/celular permanece pendente.
+
+## 16. Alinhamento com as atualizações do backend — 10/10/2026
+
+As subseções seguintes reproduzem as atualizações de 10/10 do plano do backend, com apenas ajuste dos níveis dos títulos para caber neste documento. Não substituem os registros de entregas mockadas do frontend. Esta seção prevalece em caso de conflito com regras anteriores.
+
+### Regras de negócio confirmadas para o backend — 10/10/2026
+
+Esta atualização substitui a necessidade de uma tabela `Secretarias` para o escopo contratado. O produto será vendido a prefeituras municipais e cada prefeitura representa um tenant isolado.
+
+As referências anteriores a atribuição/notificação por secretaria ficam substituídas por responsabilidade da unidade, vínculo técnico-unidade e proximidade válida. Não persistir secretaria como entidade nem usar secretaria como critério de tenancy. Regras antigas que descrevem Saúde/Educação continuam apenas como exemplos históricos do protótipo e não como requisito de schema.
+
+#### Prefeitura, usuários, técnicos e unidades
+
+- `Prefeitura` é o cliente/tenant. Usuários, técnicos, unidades e chamados devem ficar vinculados e isolados por prefeitura.
+- Não criar tabela `Secretarias` nesta etapa. As unidades são pontos de atendimento de uma prefeitura.
+- `UnidadeAtendimento` possui nome, endereço e coordenadas obrigatórias de latitude/longitude para permitir localização e proximidade. A migration mantém unidades legadas sem coordenadas como nulas, mas novos cadastros devem informar ambas.
+- `Tecnico` é um perfil próprio ligado a um usuário. Um técnico pode atender várias unidades e uma unidade pode ter vários técnicos; a relação é `TecnicoUnidadeAtendimento`.
+- A unidade escolhida no chamado determina a prefeitura e os técnicos candidatos vinculados a ela. A elegibilidade e disponibilidade ainda precisam ser verificadas antes de atribuição.
+
+#### Histórico, comentários e participantes
+
+- `EventoChamado` mantém tipo, descrição, autor opcional para eventos de sistema e data/hora do evento.
+- Abertura do chamado, atribuição/vínculo de responsável e conclusão devem gerar eventos automáticos. O técnico responsável pode registrar eventos descritivos de progresso. Eventos são append-only e não substituem o estado atual do chamado.
+- `ComentarioChamado` guarda comentários do solicitante e dos técnicos, com autor e data/hora. Comentários e eventos são registros diferentes: comentário é conversa; evento é trilha operacional.
+- `ParticipantesChamado` registra técnicos colaboradores mantendo apenas um responsável principal. Vínculo de participante não inicia atendimento automaticamente.
+
+#### Localização, push e anexos
+
+- `PosicoesTecnico` armazena latitude, longitude, precisão, data/hora e chamado associado quando houver. Segue a regra anterior de captura durante execução, a cada 10 minutos, interrompida em pausa ou conclusão.
+- `NotificacoesPush` persiste notificações pendentes, enviadas e com falha, incluindo tentativas, horário e chave de deduplicação. `DispositivosPush` guarda endpoints/credenciais de inscrição por usuário para permitir o envio ao dispositivo.
+- `AnexosChamado` guarda metadados e localização do arquivo, autor e tipo. Arquivos devem ficar em armazenamento de objetos/arquivos apropriado; não embutir binários grandes no registro relacional.
+- Para concluir chamado, é obrigatório existir um anexo de imagem classificado como `FotoEntrega`. A conclusão deve validar esse anexo no backend, persistir evento de conclusão e mudar o estado na mesma operação. Só registrar o metadado do anexo não comprova que o upload foi concluído com sucesso.
+
+#### Tabelas presentes no modelo atual
+
+`Prefeituras`, `Usuarios`, `UnidadesAtendimento`, `Chamados`, `Tecnicos`, `TecnicoUnidadeAtendimento`, `EventosChamado`, `ComentariosChamado`, `ParticipantesChamado`, `PosicoesTecnico`, `NotificacoesPush`, `DispositivosPush` e `AnexosChamado`.
+
+Essa lista descreve o modelo/schema preparado, não significa que upload de arquivos, envio real de push, atribuição automática, operações de fechamento ou autorização multi-tenant estejam completos. A migration cria uma prefeitura inicial de São José dos Pinhais e dados fictícios de demonstração. A foto e a inscrição de push semeadas são metadados/valores de teste, não arquivos ou dispositivos reais.
+
+
+### Status do chamado — 10/10/2026
+
+Catálogo vigente: **Aberto, Em Análise e Resolvido**. Esta atualização substitui grafias anteriores. Vínculo, execução, pausa, bloqueio e espera de validação/análise são etapas internas. Conclusão pelo técnico mantém Em Análise; confirmação do solicitante marca Resolvido.
+
+Backend: enum StatusChamado, resposta JSON textual e filtro com validação do catálogo. EtapaAtendimento preserva os estados operacionais anteriores. Migration 20261010130004_SepararStatusEtapaChamado converte dados sem apagar histórico e recusa status desconhecidos. Migration ainda não aplicada ao banco operacional nesta entrega.
+
+Escopo atual: somente backend. As alterações de status feitas inicialmente no frontend foram desfeitas a pedido do usuário; sua adaptação fica para a integração futura. Priorização por IA permanece para entrega futura.
+
+### Unidade de atendimento e atribuição imediata — regra a integrar
+
+A regra acrescentada no backend exige cadastro administrativo de unidades e associação de técnicos a uma ou mais unidades. Chamado referencia a unidade por ID; o contrato atual usa UnidadeAtendimentoId. Evitar adotar a grafia provisória unidade_antecedimento da seção histórica como novo campo.
+
+- [ ] Criar gestão de unidades no frontend na etapa de integração, com nome, endereço, coordenadas e situação.
+- [ ] Integrar gestão de técnicos e vínculos técnico-unidade; não usar secretaria como substituto desse vínculo.
+- [ ] Consultar e persistir unidade autorizada por ID no cadastro, filtros, detalhes e visão do técnico.
+- [ ] Abertura identifica os responsáveis pela unidade e atribui um único técnico elegível imediatamente, conforme política a definir.
+- [ ] Registrar vínculo, autoria/motivo e horário no histórico; emitir aviso/push ao responsável.
+- [ ] Aceite/vínculo não inicia execução ou cronômetro.
+- [ ] Tratar vários candidatos ou ausência de técnico vinculado sem duplicar responsável.
+- [ ] Manter cooperação voluntária e proximidade válida dentro da mesma prefeitura; revalidar elegibilidade/disponibilidade.
+
+Atribuição automática, upload real, push e operações de conclusão continuam pendentes no backend; não marcar a integração como entregue somente porque as tabelas existem.
+
+### Diferenças que permanecem no frontend até a integração
+
+| Tema | Regra do backend a seguir | Frontend atual / adaptação pendente |
+|---|---|---|
+| Prefeitura | Tenant isolado; vínculos por prefeitura | Sessão demo sem prefeitura; incorporar identidade/contrato operacional |
+| Responsabilidade | Unidade e vínculo técnico-unidade | Regras por secretaria; ajustar catálogo, gestão, acesso, avisos e filtros |
+| Atribuição | Vínculo imediato por unidade, sem execução automática | Cadastro deixa chamado disponível para assunção; integrar nova atribuição |
+| Status | Aberto, Em Análise, Resolvido; enum no backend | Em aberto/Em análise no código; migrar grafia local quando a integração for autorizada |
+| Etapas | EtapaAtendimento separado | executionState já separado; definir tradução comum entre contratos |
+| Conversa | Comentários separados de eventos operacionais | Histórico/eventos locais; criar fluxo de comentários e integrar registros distintos |
+| Evidências | FotoEntrega enviada e validada para concluir | Conclusão somente com texto; integrar upload, consulta e validação |
+| IA | Priorização futura | Não desenvolver matriz manual; preparar consumo dos resultados quando houver agente |
+
+### Validação desta atualização documental
+
+Comparados os dois documentos e importadas as regras novas do backend; preservados registros de ranking/patentes e demais entregas históricas do frontend. Nenhum arquivo de código foi alterado nesta etapa. Não foram executados novos testes de aplicação, API, banco ou navegador. O README do backend continua sendo o registro do trabalho em execução; frontend e integração permanecem futuros.
+
+## 17. Integração do login do usuário — 10/10/2026
+
+
+
+Login do solicitante integrado a POST /api/auth/web/login. O frontend envia email normalizado, senha preservada e prefeituraId definido por instalação; aceita somente papel Usuario. Técnico, Gestor e Admin permanecem fora desta integração.
+
+Token e identidade ficam em sessionStorage por aba. O cliente Axios envia Bearer nas chamadas protegidas. Expiração ou resposta 401 encerra a sessão; logout remove o token. Há bloqueio de envio repetido, estado Entrando e mensagens para credenciais inválidas, acesso negado, autenticação desabilitada, timeout e indisponibilidade da API. Nome, e-mail e prefeitura no perfil vêm da resposta autenticada.
+
+A conta real acessa /meus-chamados e /perfil. Acompanhamento e abertura de chamados pela API serão a próxima etapa; a tela informa essa pendência e a abertura está desabilitada. Dados fictícios e notificações demonstrativas não são apresentados à conta real. O modo demo preserva os fluxos anteriores.
+
+### Configuração local
+
+Copiar .env.example para .env.local e reiniciar o Vite:
+
+```dotenv
+VITE_AUTH_MODE=api
+VITE_API_URL=http://localhost:5286
+VITE_PREFEITURA_ID=00000000-0000-0000-0000-000000000001
+```
+
+Esse ID corresponde à prefeitura de demonstração do seed; substituir pelo ID da instalação. As contas de perfis-de-acesso.md funcionam somente com VITE_AUTH_MODE=demo e não autenticam na API.
+
+No backend, habilitar Authentication__Enabled=true e definir JwtSettings__Issuer, JwtSettings__Audience e JwtSettings__SigningKey (mínimo 32 bytes) em variáveis de ambiente ou user-secrets. A chave pertence somente ao backend. A origem do front deve constar em AllowedOrigins; localhost:5173 já está configurado. É necessário banco com schema aplicado e conta Usuario ativa, vinculada à prefeitura, com PasswordHash válido.
+
+O backend continua com JWT desabilitado por padrão. Nenhum banco operacional ou configuração de segredo foi criado nesta entrega; a pendência conhecida de aplicação das migrations históricas está registrada no README do backend. Os testes HTTP usam banco SQLite temporário criado com EnsureCreated e não comprovam a cadeia de migrations.
+
+Validação: lint, build, check:login, check:statuses e check:ranking do frontend; teste HTTP do backend com login, uso efetivo de Bearer, isolamento entre prefeituras, autorização e rejeição de credenciais/contas inválidas. Validação visual em navegador permanece pendente. Build mantém aviso de bundle acima de 500 kB.

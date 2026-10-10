@@ -1,6 +1,9 @@
-import { useState, type FormEvent } from 'react'
+import { useRef, useState, type FormEvent } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
-import { getDemoUser, loginDemo, roleHome } from '@/data/access-profiles'
+import { loginDemo, roleHome } from '@/data/access-profiles'
+import { useSessionUser } from '@/hooks/use-session-user'
+import { authMode } from '@/lib/auth-config'
+import { loginUser } from '@/services/auth.service'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -9,16 +12,24 @@ export default function Login() {
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
   const [message, setMessage] = useState('')
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  const [submitting, setSubmitting] = useState(false)
+  const pending = useRef(false)
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    if (pending.current) return
     const form = new FormData(event.currentTarget)
+    pending.current = true
+    setSubmitting(true)
+    setMessage('')
     try {
-      const user = loginDemo(String(form.get('email') ?? ''), String(form.get('password') ?? ''))
+      const email = String(form.get('email') ?? ''), password = String(form.get('password') ?? '')
+      const user = authMode === 'demo' ? loginDemo(email, password) : await loginUser(email, password).then(() => ({ role: 'usuario' as const }))
       if (!user) { setMessage('E-mail ou senha de demonstração incorretos.'); return }
       navigate(roleHome[user.role], { replace: true })
-    } catch { setMessage('Não foi possível salvar a sessão. Habilite o armazenamento do navegador e tente novamente.') }
+    } catch (error) { setMessage(error instanceof Error ? error.message : 'Não foi possível entrar. Tente novamente.') }
+    finally { pending.current = false; setSubmitting(false) }
   }
-  const currentUser = getDemoUser()
+  const currentUser = useSessionUser()
   if (currentUser) return <Navigate to={roleHome[currentUser.role]} replace />
   return (
     <main className="min-h-screen bg-[#f7f9f8] text-slate-900 selection:bg-emerald-200">
@@ -56,14 +67,14 @@ export default function Login() {
                 <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Bem-vindo de volta</h2>
                 <p className="text-base leading-6 text-slate-600">Acesse sua conta para acompanhar seus chamados e missões.</p>
               </div>
-              <p className="mb-6 rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs leading-5 text-amber-900">Modo demonstração: entre com uma das contas de usuário, técnico ou administrador listadas em perfis-de-acesso.md.</p>
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="space-y-2"><Label htmlFor="email">E-mail institucional</Label><Input id="email" name="email" type="email" autoComplete="username" placeholder="voce@sjp.pr.gov.br" required maxLength={254} className="h-12 rounded-lg bg-white px-4 focus-visible:ring-emerald-700" onChange={() => setMessage('')} /></div>
+              {authMode === 'demo' && <p className="mb-6 rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs leading-5 text-amber-900">Modo demonstração: entre com uma das contas de usuário, técnico ou administrador listadas em perfis-de-acesso.md.</p>}
+              <form onSubmit={handleSubmit} aria-busy={submitting} className="space-y-6">
+                <div className="space-y-2"><Label htmlFor="email">E-mail institucional</Label><Input disabled={submitting} id="email" name="email" type="email" autoComplete="username" placeholder="voce@sjp.pr.gov.br" required maxLength={254} className="h-12 rounded-lg bg-white px-4 focus-visible:ring-emerald-700" onChange={() => setMessage('')} /></div>
                 <div className="space-y-2">
                   <Label htmlFor="password">Senha</Label>
-                  <div className="relative"><Input id="password" name="password" type={showPassword ? 'text' : 'password'} autoComplete="current-password" placeholder="Digite sua senha" required className="h-12 rounded-lg bg-white pl-4 pr-24 focus-visible:ring-emerald-700" onChange={() => setMessage('')} /><Button type="button" variant="ghost" size="sm" aria-controls="password" aria-pressed={showPassword} aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'} onClick={() => setShowPassword(!showPassword)} className="absolute right-1 top-1.5 text-xs text-slate-600">{showPassword ? 'Ocultar' : 'Mostrar'}</Button></div>
+                  <div className="relative"><Input disabled={submitting} maxLength={200} id="password" name="password" type={showPassword ? 'text' : 'password'} autoComplete="current-password" placeholder="Digite sua senha" required className="h-12 rounded-lg bg-white pl-4 pr-24 focus-visible:ring-emerald-700" onChange={() => setMessage('')} /><Button type="button" variant="ghost" size="sm" aria-controls="password" aria-pressed={showPassword} aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'} onClick={() => setShowPassword(!showPassword)} className="absolute right-1 top-1.5 text-xs text-slate-600">{showPassword ? 'Ocultar' : 'Mostrar'}</Button></div>
                 </div>
-                <Button type="submit" className="h-12 w-full rounded-lg bg-[#103c32] text-sm font-semibold text-white hover:bg-[#185443] focus-visible:ring-emerald-700">Entrar na plataforma <span aria-hidden="true" className="ml-3">→</span></Button>
+                <Button type="submit" disabled={submitting} className="h-12 w-full rounded-lg bg-[#103c32] text-sm font-semibold text-white hover:bg-[#185443] focus-visible:ring-emerald-700">{submitting ? 'Entrando…' : 'Entrar na plataforma'} <span aria-hidden="true" className="ml-3">→</span></Button>
                 <p role="status" aria-live="polite" className={message ? 'rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm leading-6 text-emerald-950' : 'sr-only'}>{message}</p>
               </form>
               <div className="mt-8 border-t border-slate-200 pt-6 text-center"><p className="text-sm text-slate-600">Precisa de ajuda para acessar?</p><p className="mt-1 text-sm font-medium text-[#103c32]">Entre em contato com o suporte de TI.</p></div>

@@ -1,6 +1,6 @@
 # Missão SJP — Frontend
 
-Frontend para atendimento de TI da Prefeitura, com visão web para usuário/administrador e visão mobile para técnico. O código atual implementa a jornada de atendimento com dados fictícios e persistência local; integração com backend, GPS e push reais ficam para uma etapa posterior.
+Frontend para atendimento de TI da Prefeitura, com visão web para usuário/administrador e visão mobile para técnico. O código atual implementa a jornada de atendimento com dados fictícios e persistência local; login do usuário já consome o backend; chamados, GPS e push reais ficam para as próximas etapas.
 
 Este README registra o estado observado do código e os próximos passos conforme as regras de negócio definidas. Plano detalhado: [análise e regras de negócio](ANALISE_FRONTEND_E_PLANO_DE_IMPLEMENTACAO.md).
 
@@ -19,11 +19,11 @@ Veja [perfis-de-acesso.md](./perfis-de-acesso.md) para credenciais, rotas e perm
 - [x] Status dos chamados: Em aberto, Em análise e Resolvido. Etapas operacionais aparecem nos detalhes do atendimento.
 - [x] Mapa Leaflet com destino, trajeto, posição e distância simulados; aviso quando o fundo não carrega.
 - [x] Componentes locais Button, Input, Label, Dialog e componentes de dashboard.
-- [x] Cliente Axios preparado para `VITE_API_URL`, ainda sem consumo pelas páginas.
+- [x] Cliente Axios configurado por `VITE_API_URL`, com login real do usuário e Bearer para chamadas protegidas.
 - [x] Labels, nomes acessíveis, estados textuais e link para o conteúdo em partes da interface.
 - [x] Assistente de IA retirado dos menus desktop/mobile e menção à IA removida do login. IA fora do escopo da interface nesta fase.
 
-**Limitações atuais:** sessão e guardas são apenas simulações locais, sem segurança de backend; dashboard e listas agora usam a mesma base mockada persistida; aceite, início, eventos, pausa/bloqueio, cronômetro e conclusão já estão implementados com mocks; validação/avaliação do solicitante e análise/devolução administrativa também estão implementadas; ainda faltam cooperação, evidências, push, GPS real e ranking por equipe/configuração. Ranking individual e dashboard técnico já entregues com mocks. Técnicos está habilitado; Conquistas e Relatórios foram retirados dos menus nesta fase. Responsividade não comprova um aplicativo capaz de capturar GPS em segundo plano.
+**Limitações atuais:** login do usuário usa JWT e autorização do backend; técnico e administrador continuam demonstrativos; dashboard e listas agora usam a mesma base mockada persistida; aceite, início, eventos, pausa/bloqueio, cronômetro e conclusão já estão implementados com mocks; validação/avaliação do solicitante e análise/devolução administrativa também estão implementadas; ainda faltam cooperação, evidências, push, GPS real e ranking por equipe/configuração. Ranking individual e dashboard técnico já entregues com mocks. Técnicos está habilitado; Conquistas e Relatórios foram retirados dos menus nesta fase. Responsividade não comprova um aplicativo capaz de capturar GPS em segundo plano.
 
 ## Regras que orientam a implementação
 
@@ -53,7 +53,7 @@ O manual original exige abertura por atendente e uma aplicação de IA. As instr
 
 ## Atualização do plano: frontend primeiro
 
-Todo desenvolvimento desta fase usa dados mockados, sem depender do backend. Os serviços serão simulados e substituídos pela API posteriormente. Já foram entregues os três perfis, validação das credenciais fictícias, sessão por aba, guardas por papel, menus e consulta filtrada de chamados. Já foram entregues também os mocks compartilhados, cadastro por usuário/administrador, ordem de serviço digital e persistência local. As ações do técnico também já foram entregues com persistência local. Confirmação/avaliação e retorno de pendência também foram entregues. Próximas pendências: perfis editáveis/foto, evidências, disponibilidade, notificações e mapa mockados, cooperação e ranking. Edição de perfil/foto e demais ações continuam pendentes.
+A fase inicial utilizou dados mockados. A integração começou pelo login real do usuário em 10/10/2026, conforme a seção ao final deste README. Os serviços serão simulados e substituídos pela API posteriormente. Já foram entregues os três perfis, validação das credenciais fictícias, sessão por aba, guardas por papel, menus e consulta filtrada de chamados. Já foram entregues também os mocks compartilhados, cadastro por usuário/administrador, ordem de serviço digital e persistência local. As ações do técnico também já foram entregues com persistência local. Confirmação/avaliação e retorno de pendência também foram entregues. Próximas pendências: perfis editáveis/foto, evidências, disponibilidade, notificações e mapa mockados, cooperação e ranking. Edição de perfil/foto e demais ações continuam pendentes.
 
 O roteiro abaixo preserva também tarefas futuras de integração; referências ao backend não bloqueiam a entrega mockada.
 
@@ -452,3 +452,29 @@ Dez patentes: Soldado raso (0–99), Soldado (100–249), Cabo (250–499), Sarg
 
 
 Ampliação aprovada: dez patentes, conforme catálogo da seção 15 do plano. Pontos existentes preservados; patente e progresso são recalculados com os novos limiares. Validação: npm run check:ranking, npm run lint e npm run build aprovados, incluindo limites inferiores/superiores das dez faixas, progresso e General em 5.000 pontos. Validação visual em navegador/celular permanece pendente.
+
+## Login real do usuário — 10/10/2026
+
+Login do solicitante integrado a POST /api/auth/web/login. O frontend envia email normalizado, senha preservada e prefeituraId definido por instalação; aceita somente papel Usuario. Técnico, Gestor e Admin permanecem fora desta integração.
+
+Token e identidade ficam em sessionStorage por aba. O cliente Axios envia Bearer nas chamadas protegidas. Expiração ou resposta 401 encerra a sessão; logout remove o token. Há bloqueio de envio repetido, estado Entrando e mensagens para credenciais inválidas, acesso negado, autenticação desabilitada, timeout e indisponibilidade da API. Nome, e-mail e prefeitura no perfil vêm da resposta autenticada.
+
+A conta real acessa /meus-chamados e /perfil. Acompanhamento e abertura de chamados pela API serão a próxima etapa; a tela informa essa pendência e a abertura está desabilitada. Dados fictícios e notificações demonstrativas não são apresentados à conta real. O modo demo preserva os fluxos anteriores.
+
+### Configuração local
+
+Copiar .env.example para .env.local e reiniciar o Vite:
+
+```dotenv
+VITE_AUTH_MODE=api
+VITE_API_URL=http://localhost:5286
+VITE_PREFEITURA_ID=00000000-0000-0000-0000-000000000001
+```
+
+Esse ID corresponde à prefeitura de demonstração do seed; substituir pelo ID da instalação. As contas de perfis-de-acesso.md funcionam somente com VITE_AUTH_MODE=demo e não autenticam na API.
+
+No backend, habilitar Authentication__Enabled=true e definir JwtSettings__Issuer, JwtSettings__Audience e JwtSettings__SigningKey (mínimo 32 bytes) em variáveis de ambiente ou user-secrets. A chave pertence somente ao backend. A origem do front deve constar em AllowedOrigins; localhost:5173 já está configurado. É necessário banco com schema aplicado e conta Usuario ativa, vinculada à prefeitura, com PasswordHash válido.
+
+O backend continua com JWT desabilitado por padrão. Nenhum banco operacional ou configuração de segredo foi criado nesta entrega; a pendência conhecida de aplicação das migrations históricas está registrada no README do backend. Os testes HTTP usam banco SQLite temporário criado com EnsureCreated e não comprovam a cadeia de migrations.
+
+Validação: lint, build, check:login, check:statuses e check:ranking do frontend; teste HTTP do backend com login, uso efetivo de Bearer, isolamento entre prefeituras, autorização e rejeição de credenciais/contas inválidas. Validação visual em navegador permanece pendente. Build mantém aviso de bundle acima de 500 kB.

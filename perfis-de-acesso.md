@@ -1,6 +1,6 @@
 # Perfis de acesso — demonstração do frontend
 
-Todas as contas são fictícias e as credenciais são públicas, exclusivas do protótipo. Não há backend ou autenticação real. Abra `/login` e use:
+Todas as contas são fictícias e as credenciais são públicas, exclusivas do protótipo. Estas contas funcionam somente com `VITE_AUTH_MODE=demo`. No modo padrão `api`, o login usa uma conta real de papel Usuario cadastrada no backend. Configure a API e a prefeitura conforme o README. Para demonstração, reinicie o Vite com esse modo e abra `/login`:
 
 | Perfil | Nome | E-mail | Senha | Página inicial |
 |---|---|---|---|---|

@@ -14,6 +14,7 @@ export default function MyTickets() {
   const [selectedId, setSelectedId] = useState<number | null>(null)
   const [filter, setFilter] = useState('Todos')
   if (!user) return null
+  if (user.authSource === 'api') return <div className="space-y-6"><h1 className="text-3xl font-semibold">Meus chamados</h1><Card className="space-y-3 p-6"><h2 className="text-lg font-semibold">Olá, {user.name}</h2><p className="text-sm text-slate-600">Sua conta está conectada. O acompanhamento de chamados será disponibilizado na próxima etapa.</p></Card></div>
   const technician = user.role === 'tecnico'
   // Filtro por nomes apenas para fixtures atuais; contratos futuros devem usar IDs.
   const allowed = mockTickets.filter(ticket => technician

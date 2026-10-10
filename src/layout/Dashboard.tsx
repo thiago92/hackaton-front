@@ -3,7 +3,9 @@ import { useNotifications } from '@/hooks/use-notifications'
 import { useEffect, useState } from 'react'
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
-import { getDemoUser, logoutDemo, roleLabels } from '@/data/access-profiles'
+import { logoutDemo, roleLabels } from '@/data/access-profiles'
+
+import { useSessionUser } from '@/hooks/use-session-user'
 
 const adminItems = [
   { label: 'Dashboard', symbol: '◫', path: '/dashboard' },
@@ -18,7 +20,7 @@ export default function DashboardLayout() {
   const [menuOpen, setMenuOpen] = useState(false)
   const navigate = useNavigate()
   const location = useLocation()
-  const user = getDemoUser()
+  const user = useSessionUser()
   const { notices, readIds } = useNotifications()
   const unreadCount = notices.filter(notice => notice.recipientId === user?.id && !readIds.includes(notice.id)).length
   const [positionError, setPositionError] = useState('')
@@ -30,9 +32,9 @@ export default function DashboardLayout() {
   if (!user) return null
   const items: { label: string; symbol: string; path?: string }[] = [
     ...(user.role === 'administrador' ? adminItems : user.role === 'usuario'
-      ? [{ label: 'Meus chamados', symbol: '▤', path: '/meus-chamados' }, { label: 'Novo chamado', symbol: '+', path: '/novo-chamado' }]
+      ? [{ label: 'Meus chamados', symbol: '▤', path: '/meus-chamados' }, { label: 'Novo chamado', symbol: '+', path: user.authSource === 'api' ? undefined : '/novo-chamado' }]
       : [{ label: 'Dashboard', symbol: '◫', path: '/dashboard-tecnico' }, { label: 'Minhas missões', symbol: '▤', path: '/minhas-missoes' }, { label: 'Ranking', symbol: '☆', path: '/ranking' }]),
-    { label: 'Notificações', symbol: '♧', path: '/notificacoes' },
+    ...(user.authSource === 'api' ? [] : [{ label: 'Notificações', symbol: '♧', path: '/notificacoes' }]),
     { label: 'Meu perfil', symbol: '○', path: '/perfil' },
   ]
   const pageTitle = items.find(item => item.path === location.pathname)?.label ?? 'Área de trabalho'
@@ -54,7 +56,7 @@ export default function DashboardLayout() {
         <header className="border-b border-slate-200 bg-white px-5 sm:px-8">
           <div className="flex min-h-20 items-center justify-between gap-4">
             <div className="flex items-center gap-3"><Button variant="outline" size="icon" className="lg:hidden" aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'} aria-expanded={menuOpen} aria-controls="mobile-navigation" onClick={() => setMenuOpen(!menuOpen)}><span aria-hidden="true">{menuOpen ? '×' : '☰'}</span></Button><div><p className="text-sm font-medium">{pageTitle}</p><p className="mt-0.5 text-xs text-slate-500">Seu trabalho, conectado.</p></div></div>
-            <div className="flex items-center gap-3"><Button asChild variant="outline" size="sm"><NavLink to="/notificacoes" aria-label={`Notificações: ${unreadCount} não lidas`}>Avisos {unreadCount > 0 && <span className="ml-1 rounded-full bg-emerald-700 px-2 py-0.5 text-xs text-white">{unreadCount}</span>}</NavLink></Button><span className="hidden rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs text-amber-900 sm:block">Demonstração</span><span aria-hidden="true" className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100 text-sm font-semibold text-[#103c32]">{initials}</span><div className="hidden sm:block"><p className="text-sm font-medium">{user.name}</p><p className="text-xs text-slate-500">{roleLabels[user.role]}</p></div></div>
+            <div className="flex items-center gap-3">{user.authSource !== 'api' && <Button asChild variant="outline" size="sm"><NavLink to="/notificacoes" aria-label={`Notificações: ${unreadCount} não lidas`}>Avisos {unreadCount > 0 && <span className="ml-1 rounded-full bg-emerald-700 px-2 py-0.5 text-xs text-white">{unreadCount}</span>}</NavLink></Button>}<span className="hidden rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs text-amber-900 sm:block">{user.authSource === 'api' ? 'Conta conectada' : 'Demonstração'}</span><span aria-hidden="true" className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100 text-sm font-semibold text-[#103c32]">{initials}</span><div className="hidden sm:block"><p className="text-sm font-medium">{user.name}</p><p className="text-xs text-slate-500">{roleLabels[user.role]}</p></div></div>
           </div>
           {menuOpen && <nav id="mobile-navigation" aria-label="Navegação principal mobile" className="grid gap-1 border-t py-3 lg:hidden">{items.map(item => item.path ? <Button key={item.label} asChild variant={location.pathname === item.path ? "secondary" : "ghost"} className="justify-start"><NavLink to={item.path} onClick={() => setMenuOpen(false)}>{item.label}</NavLink></Button> : <Button key={item.label} disabled variant="ghost" className="justify-start">{item.label}<span className="ml-auto text-xs">Em breve</span></Button>)}<Button variant="outline" onClick={handleLogout}>Sair da plataforma</Button></nav>}
         </header>

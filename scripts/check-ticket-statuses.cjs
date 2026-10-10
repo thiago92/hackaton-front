@@ -10,9 +10,9 @@ function harness(saved, failWrite = false) {
   const data = new Map(saved === undefined ? [] : [[key, saved]]);
   const listeners = new Map();
   const localStorage = { getItem: k => data.get(k) ?? null, setItem: (k, v) => { if (failWrite) throw Error('full'); data.set(k, v); }, removeItem: k => data.delete(k) };
-  const window = { localStorage, sessionStorage: { getItem: k => data.get('session:' + k) ?? null, setItem: (k, v) => data.set('session:' + k, v), removeItem: k => data.delete('session:' + k) }, addEventListener: (name, fn) => { const callbacks = listeners.get(name) ?? []; callbacks.push(fn); listeners.set(name, callbacks); } };
+  const window = { localStorage, sessionStorage: { getItem: k => data.get('session:' + k) ?? null, setItem: (k, v) => data.set('session:' + k, v), removeItem: k => data.delete('session:' + k) }, dispatchEvent: event => { listeners.get(event.type)?.forEach(fn => fn(event)); return true; }, addEventListener: (name, fn) => { const callbacks = listeners.get(name) ?? []; callbacks.push(fn); listeners.set(name, callbacks); } };
   const cache = new Map();
-  const context = vm.createContext({ window, navigator: {}, crypto: require('node:crypto').webcrypto, Date, console });
+  const context = vm.createContext({ window, navigator: {}, crypto: require('node:crypto').webcrypto, Date, Event, console });
   function load(file) {
     const full = path.join(root, 'src', file + '.ts');
     if (cache.has(full)) return cache.get(full).exports;
